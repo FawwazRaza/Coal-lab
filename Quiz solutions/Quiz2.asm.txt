@@ -1,0 +1,80 @@
+﻿[org 0x0100]
+jmp start
+array1:db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+delay:
+mov cx,0
+l2:
+mov cx,0xFFFF
+l1:
+add ax,1
+add bx,1
+add dx,1
+xor ax,ax
+xor dx,dx
+xor bx,bx
+loop l1
+ret
+scrollup: push bp 
+ mov bp,sp 
+ push ax 
+ push cx 
+ push si 
+ push di 
+ push es 
+ push ds 
+ mov ax, 80 ; load chars per row in ax 
+ mul byte [bp+4] ; calculate source position 
+ mov si, ax ; load source position in si 
+ push si ; save position for later use 
+ shl si, 1 ; convert to byte offset 
+ mov cx, 2000 ; number of screen locations 
+ sub cx, ax ; count of words to move 
+ mov ax, 0xb800 
+ mov es, ax ; point es to video base 
+ mov ds, ax ; point ds to video base 
+ xor di, di ; point di to top left column 
+ mov dx,1
+l4:mov cx,80
+ xor di, di ; point di to top left column 
+l3:
+        stosb
+ mov [array1+di],al
+loop l3
+call delay
+call delay
+xor di,di
+ mov cx, 2000 ; number of screen locations 
+ sub cx, ax ; count of words to move 
+ cld 
+ rep movsw 
+mov ax, 0x0720 ; space in normal attribute 
+mov cx,[bp+4]
+rep stosw ; clear the scrolled space 
+dec dx
+cmp dx,0
+ja l4 
+
+
+ ; xor di, di ; point di to top left column 
+ ; cld ; set auto increment mode 
+ ; rep movsw 
+ ; call delay
+ ; mov ax, 0x0720 ; space in normal attribute 
+ ; pop cx ; count of positions to clear 
+ ; rep stosw ; clear the scrolled space 
+ pop ds 
+ pop es 
+ pop di 
+ pop si 
+ pop cx 
+ pop ax 
+ pop bp 
+ ret 2 
+start: mov ax,10 
+ push ax 
+ call delay
+ call scrollup
+
+
+mov ax,0x4c00
+int 0x21

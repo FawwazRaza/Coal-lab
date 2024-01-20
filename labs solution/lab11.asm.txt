@@ -1,0 +1,263 @@
+﻿[org 0x0100]
+ jmp start
+string:db 'sEd neC nunc AC laCuS egeSTAs eLeIFeND. MORbi VoLUTpAT fAciLIsIS diGNisSIm. pROiN sit AmET EliT VeL',0
+strlength:dw 90
+stringA:db 'a or A   ',0x30,0x30,0
+stringE:db 'e or E   ',0x30,0x30,0
+stringI:db 'i or I   ',0x30,0x30,0
+stringO:db 'o or O   ',0x30,0x30,0
+stringU:db 'u or U   ',0x30,0x30,0
+countA:db 0x00
+countE:db 0x00
+countI:db 0x00
+countO:db 0x00
+countU:db 0x00
+stringother:db 'vowel    Count' 
+
+
+clrscr:
+push es 
+ push ax 
+ push cx 
+ push di 
+ mov ax, 0xb800 
+ mov es, ax ; point es to video base 
+ xor di, di ; point di to top left column 
+ mov ax, 0x0720 ; space char in normal attribute 
+ mov cx, 2000 ; number of screen locations 
+ cld ; auto increment mode 
+ rep stosw ; clear the whole screen 
+ pop di
+ pop cx 
+ pop ax 
+ pop es 
+ ret
+cmpstr:
+push ax
+push bx
+push cx
+push dx
+push di
+push si
+ mov ax, 0xb800
+ mov es, ax ; point es to video base
+ mov al, 80 ; load al with columns per row
+ mov bh,2
+ mul bh
+ add ax, 12 ; add x position
+ shl ax, 1 ; turn into byte offset
+ mov di,ax
+ mov si, string ; point si to string
+ mov cx,[strlength]
+ mov ah, 0x70 ; load attribute in ah
+nextchar: mov al, [si] ; load next char of string
+ cmp al,0x41
+ jne l1
+ add byte[countA],1
+ jmp l10
+ l1:cmp al,0x61
+ jne l2
+ add byte[countA],1
+ jmp l10
+ l2:
+ cmp al,0x45
+ jne l3
+ add byte[countE],1
+ jmp l10
+ l3:cmp al,0x65
+ jne l4
+ add byte[countE],1
+ jmp l10
+ l4:
+ cmp al,0x49
+ jne l5
+ add byte[countI],1
+ jmp l10
+ l5:
+ cmp al,0x69
+ jne l6
+ add byte[countI],1
+ jmp l10
+ l6:
+ cmp al,0x4F
+ jne l7
+ add byte[countO],1
+ jmp l10
+ l7:
+ cmp al,0x6F
+ jne l8
+ add byte[countO],1
+ jmp l10
+ l8:
+ cmp al,0x55
+ jne l9
+ add byte[countU],1
+ jmp l10
+ l9:
+ cmp al,0x75
+ jne l10
+ add byte[countU],1
+ l10:
+ ;mov [es:di], ax ; show this char on screen
+ add di, 2
+ add si, 1 
+ loop nextchar 
+ xor dx,dx
+ cmp byte[countU],9
+jg next5
+mov dl,[countU]
+  add dl,0x30
+mov [stringU+10],dl
+jmp e1
+ next5:
+ sub byte[countU],9
+ add byte[stringU+9],0x01
+ cmp byte[countU],9
+ jg next5
+ add byte[countU],0x30
+ mov dl,[countU]
+ mov byte[stringU+10],dl
+e1: xor dx,dx
+ cmp byte[countA],9
+jg next1
+mov dl,[countA]
+  add dl,0x30
+mov [stringA+10],dl
+jmp e2
+ next1:
+ sub byte[countA],9
+ add byte[stringA+9],0x01
+ cmp byte[countA],9
+ jg next1
+ add byte[countA],0x30
+ mov dl,[countA]
+ mov byte[stringA+10],dl
+e2: xor dx,dx
+ cmp byte[countE],9
+jg next2
+mov dl,[countE]
+  add dl,0x30
+mov [stringE+10],dl
+jmp e3
+ next2:
+ sub byte[countE],9
+ add byte[stringE+9],0x01
+ cmp byte[countE],9
+ jg next2
+ add byte[countE],0x30
+ mov dl,[countE]
+ mov byte[stringE+10],dl
+e3: xor dx,dx
+ 
+ cmp byte[countI],9
+jg next3
+mov dl,[countI]
+  add dl,0x30
+mov [stringI+10],dl
+jmp e4
+ next3:
+ sub byte[countI],9
+ add byte[stringI+9],0x01
+ cmp byte[countI],9
+ jg next3
+ add byte[countI],0x30
+ mov dl,[countI]
+ mov byte[stringI+10],dl
+e4: xor dx,dx
+ 
+ cmp byte[countO],9
+jg next4
+mov dl,[countO]
+  add dl,0x30
+mov [stringO+10],dl
+jmp e5
+ next4:
+ sub byte[countO],9
+ add byte[stringO+9],0x01
+ cmp byte[countO],9
+ jg next4
+ add byte[countO],0x30
+ mov dl,[countO]
+ mov byte[stringO+10],dl
+e5:
+pop si
+pop di
+pop dx
+pop cx
+pop bx
+pop ax
+ ret
+start: call clrscr ; call clrscr subroutine
+call cmpstr
+xor ax,ax
+mov ah, 0x13 ; service 13 - print string 
+ mov al, 1 ; subservice 01 – update cursor 
+ mov bh, 0 ; output on page 0 
+ mov bl, 7 ; normal attrib 
+ mov dx, 0x0A12 ; row 10 column 3 
+  mov cx, 11 ; length of string 
+ push cs 
+ pop es ; segment of string 
+ mov bp, stringA ; offset of string 
+ int 0x10
+ xor ax,ax
+mov ah, 0x13 ; service 13 - print string 
+ mov al, 1 ; subservice 01 – update cursor 
+ mov bh, 0 ; output on page 0 
+ mov bl, 7 ; normal attrib 
+ mov dx, 0x0B12 ; row 10 column 3 
+  mov cx, 11 ; length of string 
+ push cs 
+ pop es ; segment of string 
+ mov bp, stringE ; offset of string 
+ int 0x10
+ 
+ xor ax,ax
+mov ah, 0x13 ; service 13 - print string 
+ mov al, 1 ; subservice 01 – update cursor 
+ mov bh, 0 ; output on page 0 
+ mov bl, 7 ; normal attrib 
+ mov dx, 0x0C12 ; row 10 column 3 
+  mov cx, 11 ; length of string 
+ push cs 
+ pop es ; segment of string 
+ mov bp, stringI; offset of string 
+ int 0x10
+ 
+ xor ax,ax
+mov ah, 0x13 ; service 13 - print string 
+ mov al, 1 ; subservice 01 – update cursor 
+ mov bh, 0 ; output on page 0 
+ mov bl, 7 ; normal attrib 
+ mov dx, 0x0D12 ; row 10 column 3 
+  mov cx, 11 ; length of string 
+ push cs 
+ pop es ; segment of string 
+ mov bp, stringO ; offset of string 
+ int 0x10
+ 
+ xor ax,ax
+mov ah, 0x13 ; service 13 - print string 
+ mov al, 1 ; subservice 01 – update cursor 
+ mov bh, 0 ; output on page 0 
+ mov bl, 7 ; normal attrib 
+ mov dx, 0x0E12 ; row 10 column 3 
+  mov cx, 11 ; length of string 
+ push cs 
+ pop es ; segment of string 
+ mov bp, stringU ; offset of string 
+ int 0x10
+ xor ax,ax
+mov ah, 0x13 ; service 13 - print string 
+ mov al, 1 ; subservice 01 – update cursor 
+ mov bh, 0 ; output on page 0 
+ mov bl, 7 ; normal attrib 
+ mov dx, 0x0912 ; row 10 column 3 
+  mov cx, 14 ; length of string 
+ push cs 
+ pop es ; segment of string 
+ mov bp, stringother ; offset of string 
+ int 0x10
+ 
+ mov ax, 0x4c00 ; terminate program
+ int 0x21
