@@ -1,0 +1,23 @@
+push bp
+mov bp,sp;
+push cx
+push ax
+push dx;
+
+MOV AH, 00h ; interrupts to get system time
+INT 1AH ; CX:DX now hold number of clock ticks since midnight
+mov ax, dx
+xor dx, dx
+mov cx, 80;
+div cx ; here dx contains the remainder of the division - from 0 to 9
+
+add dl, '0' ; to ascii from '0' to '9'
+
+mov word[randNum],dx;
+
+
+pop cx;
+pop ax;
+pop dx;
+pop bp;
+ret

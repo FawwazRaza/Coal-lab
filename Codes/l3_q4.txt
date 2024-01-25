@@ -1,0 +1,41 @@
+////question 4/////
+For each of the code snippet given below, write value of each flag after 
+logical/arithmetic operation and mention if the jump will be taken or not
+CODE SF OF CF ZF Jump Taken?
+MOV AX, 0XF0F0
+AND AX, 0X0F0F
+JZ LABEL1
+MOV BX, 0XA2
+CMP BX, 0XC0
+JL LABEL1
+MOV AX,5 
+CMP AX,6 
+JL L1
+MOV AX,5 
+CMP AX,4 
+JG L1
+MOV DX,0XA523 
+CMP DX,0XA523 
+JE L1 
+MOV DX,0XA523 
+CMP DX,0XA523 
+JNE L5 
+MOV Ax, 0xFFFF 
+SUB AX,2 ; 
+JG LABEL
+MOV Ax, 0xFFFF 
+SUB AX,2 ; 
+JA LABEL
+
+
+
+
+SF  OF  CF  ZF  Jump ?
+0   0   0    1   y
+1   0   1    0   y
+1   0   1    0   y
+0   0   0    0   y
+0   0   0    1   y
+0   0   0    1   n
+1   0   0    0   n
+1   0   0    0   n
